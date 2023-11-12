@@ -57,6 +57,7 @@ public:
         return data[index];
     }
 
+    // Оператор сложения векторов
     Vector<T> operator+(const Vector<T>& other) const {
         if (size != other.size) {
             throw std::invalid_argument("Vectors must have the same dimension");
@@ -69,6 +70,7 @@ public:
         return result;
     }
 
+    // Оператор вычитания векторов
     Vector<T> operator-(const Vector<T>& other) const {
         if (size != other.size) {
             throw std::invalid_argument("Vectors must have the same dimension");
@@ -80,18 +82,62 @@ public:
         }
         return result;
     }
+
+    // Оператор умножения, выполняющий скалярное произведение векторов
+    T operator*(const Vector<T>& other) const {
+        if (size != other.size) {
+            throw std::invalid_argument("Vectors must have the same dimension");
+        }
+
+        T result = 0;
+        for (int i = 0; i < size; i++) {
+            result += data[i] * other[i];
+        }
+        return result;
+    }
+
+    // Оператор умножения вектора на скаляр (коммутативный)
+    Vector<T> operator*(const T& scalar) const {
+        Vector<T> result(size);
+        for (int i = 0; i < size; i++) {
+            result[i] = data[i] * scalar;
+        }
+        return result;
+    }
+
+    // Дружественная функция для обеспечения коммутативности
+    friend Vector<T> operator*(const T& scalar, const Vector<T>& vector) {
+        return vector * scalar;
+    }
 };
 
 int main() {
     srand(time(0));
 
-    // Пример использования
+    Vector<int> intVector(3, 2);
+    Vector<int> intResult = intVector * 3;
+    Vector<int> intResultComm = 3 * intVector;
 
-    Vector<float> floatVector1(3, 1.5f);
-    Vector<float> floatVector2(3, 2.5f);
-    Vector<float> floatResult = floatVector1 + floatVector2;
+    Vector<float> floatVector(3, 1.5f);
+    Vector<float> floatResult = floatVector * 2.0f;
+    Vector<float> floatResultComm = 2.0f * floatVector;
+
+    Vector<double> doubleVector(3, 1.234);
+    Vector<double> doubleResult = doubleVector * 1.5;
+    Vector<double> doubleResultComm = 1.5 * doubleVector;
 
     // Вывод результатов
+    std::cout << "intResult: ";
+    for (int i = 0; i < intResult.getSize(); i++) {
+        std::cout << intResult[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "intResultComm: ";
+    for (int i = 0; i < intResultComm.getSize(); i++) {
+        std::cout << intResultComm[i] << " ";
+    }
+    std::cout << std::endl;
 
     std::cout << "floatResult: ";
     for (int i = 0; i < floatResult.getSize(); i++) {
@@ -99,6 +145,23 @@ int main() {
     }
     std::cout << std::endl;
 
+    std::cout << "floatResultComm: ";
+    for (int i = 0; i < floatResultComm.getSize(); i++) {
+        std::cout << floatResultComm[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "doubleResult: ";
+    for (int i = 0; i < doubleResult.getSize(); i++) {
+        std::cout << doubleResult[i] << " ";
+    }
+    std::cout << std::endl;
+
+    std::cout << "doubleResultComm: ";
+    for (int i = 0; i < doubleResultComm.getSize(); i++) {
+        std::cout << doubleResultComm[i] << " ";
+    }
+    std::cout << std::endl;
 
     return 0;
 }
