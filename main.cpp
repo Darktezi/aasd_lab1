@@ -49,36 +49,56 @@ public:
         }
         return data[index];
     }
+
+    const T& operator[](int index) const{
+        if (index < 0 || index >= size) {
+            throw std::out_of_range("Index out of range");
+        }
+        return data[index];
+    }
+
+    Vector<T> operator+(const Vector<T>& other) const {
+        if (size != other.size) {
+            throw std::invalid_argument("Vectors must have the same dimension");
+        }
+
+        Vector<T> result(size);
+        for (int i = 0; i < size; i++) {
+            result[i] = data[i] + other[i];
+        }
+        return result;
+    }
+
+    Vector<T> operator-(const Vector<T>& other) const {
+        if (size != other.size) {
+            throw std::invalid_argument("Vectors must have the same dimension");
+        }
+
+        Vector<T> result(size);
+        for (int i = 0; i < size; i++) {
+            result[i] = data[i] - other[i];
+        }
+        return result;
+    }
 };
 
 int main() {
     srand(time(0));
 
-    Vector<int> intVector(5, 42);
-    Vector<float> floatVector(3, 3.14f);
-    Vector<double> doubleVector(4, 2.71828);
-
     // Пример использования
-    for (int i = 0; i < intVector.getSize(); i++) {
-        std::cout << intVector[i] << " ";
+
+    Vector<float> floatVector1(3, 1.5f);
+    Vector<float> floatVector2(3, 2.5f);
+    Vector<float> floatResult = floatVector1 + floatVector2;
+
+    // Вывод результатов
+
+    std::cout << "floatResult: ";
+    for (int i = 0; i < floatResult.getSize(); i++) {
+        std::cout << floatResult[i] << " ";
     }
     std::cout << std::endl;
 
-    for (int i = 0; i < floatVector.getSize(); i++) {
-        std::cout << floatVector[i] << " ";
-    }
-    std::cout << std::endl;
-
-    for (int i = 0; i < doubleVector.getSize(); i++) {
-        std::cout << doubleVector[i] << " ";
-    }
-    std::cout << std::endl;
-
-    Vector<int> randomIntVector(3);
-    for (int i = 0; i < randomIntVector.getSize(); i++) {
-        std::cout << randomIntVector[i] << " ";
-    }
-    std::cout << std::endl;
 
     return 0;
 }
