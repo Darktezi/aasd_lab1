@@ -2,105 +2,106 @@
 #include <cstdlib>
 #include <ctime>
 #include <random>
+#include <complex>
 
 template <typename T>
 class Vector {
 private:
-    T* data;
-    int size;
+    T* _data;
+    int _size;
 
 public:
     //  онструктор с параметрами: размерность вектора и значение дл€ заполнени€
-    Vector(int dimension, T value) : size(dimension) {
-        data = new T[dimension];
-        for (int i = 0; i < dimension; i++) {
-            data[i] = value;
+    Vector(int dimension, T value) : _size(dimension) {
+        _data = new T[dimension];
+        for (int i = 0; i < dimension; ++i) {
+            _data[i] = value;
         }
     }
 
     //  онструктор, заполн€ющий вектор случайными значени€ми
-    Vector(int dimension) : size(dimension) {
+    Vector(int dimension) : _size(dimension) {
         if (dimension <= 0) {
             throw std::invalid_argument("Vector dimension must be greater than 0");
         }
-        data = new T[dimension];
+        _data = new T[dimension];
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_real_distribution<double> dis(0.0, 100.0);
-        for (int i = 0; i < dimension; i++) {
-            data[i] = static_cast<T>(dis(gen));
+        for (int i = 0; i < dimension; ++i) {
+            _data[i] = static_cast<T>(dis(gen));
         }
     }
 
     // ƒеструктор
     ~Vector() {
-        delete[] data;
+        delete[] _data;
     }
 
     // ћетод дл€ получени€ размерности вектора
-    int getSize() {
-        return size;
+    int get_size() {
+        return _size;
     }
 
     // ћетод дл€ доступа к элементам вектора по индексу
     T& operator[](int index) {
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= _size) {
             throw std::out_of_range("Index out of range");
         }
-        return data[index];
+        return _data[index];
     }
 
     const T& operator[](int index) const{
-        if (index < 0 || index >= size) {
+        if (index < 0 || index >= _size) {
             throw std::out_of_range("Index out of range");
         }
-        return data[index];
+        return _data[index];
     }
 
     // ќператор сложени€ векторов
     Vector<T> operator+(const Vector<T>& other) const {
-        if (size != other.size) {
+        if (_size != other._size) {
             throw std::invalid_argument("Vectors must have the same dimension");
         }
 
-        Vector<T> result(size);
-        for (int i = 0; i < size; i++) {
-            result[i] = data[i] + other[i];
+        Vector<T> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] + other[i];
         }
         return result;
     }
 
     // ќператор вычитани€ векторов
     Vector<T> operator-(const Vector<T>& other) const {
-        if (size != other.size) {
+        if (_size != other._size) {
             throw std::invalid_argument("Vectors must have the same dimension");
         }
 
-        Vector<T> result(size);
-        for (int i = 0; i < size; i++) {
-            result[i] = data[i] - other[i];
+        Vector<T> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] - other[i];
         }
         return result;
     }
 
     // ќператор умножени€, выполн€ющий скал€рное произведение векторов
     T operator*(const Vector<T>& other) const {
-        if (size != other.size) {
+        if (_size != other._size) {
             throw std::invalid_argument("Vectors must have the same dimension");
         }
 
         T result = 0;
-        for (int i = 0; i < size; i++) {
-            result += data[i] * other[i];
+        for (int i = 0; i < _size; ++i) {
+            result += _data[i] * other[i];
         }
         return result;
     }
 
     // ќператор умножени€ вектора на скал€р (коммутативный)
     Vector<T> operator*(const T& scalar) const {
-        Vector<T> result(size);
-        for (int i = 0; i < size; i++) {
-            result[i] = data[i] * scalar;
+        Vector<T> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] * scalar;
         }
         return result;
     }
@@ -109,59 +110,141 @@ public:
     friend Vector<T> operator*(const T& scalar, const Vector<T>& vector) {
         return vector * scalar;
     }
+
+    // ќператор делени€ вектора на скал€р
+    Vector<T> operator/(const T& scalar) const {
+        if (scalar == 0) {
+            throw std::invalid_argument("Division by zero");
+        }
+
+        Vector<T> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] / scalar;
+        }
+        return result;
+    }
+};
+
+template <typename T>
+class Vector<std::complex<T>> {
+private:
+    std::complex<T>* _data;
+    int _size;
+
+public:
+    Vector(int dimension, const std::complex<T>& value) : _size(dimension) {
+        _data = new std::complex<T>[dimension];
+        for (int i = 0; i < dimension; ++i) {
+            _data[i] = value;
+        }
+    }
+
+    Vector(int dimension) : _size(dimension) {
+        if (dimension <= 0) {
+            throw std::invalid_argument("Vector dimension must be greater than 0");
+        }
+        _data = new std::complex<T>[dimension];
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_real_distribution<T> dis(-1.0, 1.0);
+        for (int i = 0; i < dimension; ++i) {
+            T realPart = dis(gen);
+            T imagPart = dis(gen);
+            _data[i] = std::complex<T>(realPart, imagPart);
+        }
+    }
+
+    ~Vector() {
+        delete[] _data;
+    }
+
+    int get_size() const {
+        return _size;
+    }
+
+    std::complex<T>& operator[](int index) {
+        if (index < 0 || index >= _size) {
+            throw std::out_of_range("Index out of range");
+        }
+        return _data[index];
+    }
+
+    const std::complex<T>& operator[](int index) const{
+        if (index < 0 || index >= _size) {
+            throw std::out_of_range("Index out of range");
+        }
+        return _data[index];
+    }
+
+    // ќператор сложени€ векторов
+    Vector<std::complex<T>> operator+(const Vector<std::complex<T>>& other) const {
+        if (_size != other._size) {
+            throw std::invalid_argument("Vectors must have the same dimension for addition");
+        }
+
+        Vector<std::complex<T>> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] + other[i];
+        }
+        return result;
+    }
+
+    // ќператор вычитани€ векторов
+    Vector<std::complex<T>> operator-(const Vector<std::complex<T>>& other) const {
+        if (_size != other._size) {
+            throw std::invalid_argument("Vectors must have the same dimension for subtraction");
+        }
+
+        Vector<std::complex<T>> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] - other[i];
+        }
+        return result;
+    }
+
+    // ќператор умножени€ дл€ скал€рного произведени€ векторов
+    std::complex<T> operator*(const Vector<std::complex<T>>& other) const {
+        if (_size != other._size) {
+            throw std::invalid_argument("Vectors must have the same dimension for scalar product");
+        }
+
+        std::complex<T> result(0, 0);
+        for (int i = 0; i < _size; ++i) {
+            result += _data[i] * (std::conj(other[i]));
+        }
+        return result;
+    }
+
+    // ќператор умножени€ вектора на скал€р (коммутативный)
+    Vector<std::complex<T>> operator*(const T& scalar) const {
+        Vector<std::complex<T>> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] * scalar;
+        }
+        return result;
+    }
+
+    // ƒружественна€ функци€ дл€ обеспечени€ коммутативности умножени€ вектора на скал€р
+    friend Vector<std::complex<T>> operator*(const T& scalar, const Vector<std::complex<T>>& vector) {
+        return vector * scalar;
+    }
+
+    // ќператор делени€ вектора на скал€р
+    Vector<std::complex<T>> operator/(const T& scalar) const {
+        if (scalar == 0) {
+            throw std::invalid_argument("Division by zero");
+        }
+
+        Vector<std::complex<T>> result(_size);
+        for (int i = 0; i < _size; ++i) {
+            result[i] = _data[i] / scalar;
+        }
+        return result;
+    }
 };
 
 int main() {
     srand(time(0));
-
-    Vector<int> intVector(3, 2);
-    Vector<int> intResult = intVector * 3;
-    Vector<int> intResultComm = 3 * intVector;
-
-    Vector<float> floatVector(3, 1.5f);
-    Vector<float> floatResult = floatVector * 2.0f;
-    Vector<float> floatResultComm = 2.0f * floatVector;
-
-    Vector<double> doubleVector(3, 1.234);
-    Vector<double> doubleResult = doubleVector * 1.5;
-    Vector<double> doubleResultComm = 1.5 * doubleVector;
-
-    // ¬ывод результатов
-    std::cout << "intResult: ";
-    for (int i = 0; i < intResult.getSize(); i++) {
-        std::cout << intResult[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "intResultComm: ";
-    for (int i = 0; i < intResultComm.getSize(); i++) {
-        std::cout << intResultComm[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "floatResult: ";
-    for (int i = 0; i < floatResult.getSize(); i++) {
-        std::cout << floatResult[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "floatResultComm: ";
-    for (int i = 0; i < floatResultComm.getSize(); i++) {
-        std::cout << floatResultComm[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "doubleResult: ";
-    for (int i = 0; i < doubleResult.getSize(); i++) {
-        std::cout << doubleResult[i] << " ";
-    }
-    std::cout << std::endl;
-
-    std::cout << "doubleResultComm: ";
-    for (int i = 0; i < doubleResultComm.getSize(); i++) {
-        std::cout << doubleResultComm[i] << " ";
-    }
-    std::cout << std::endl;
 
     return 0;
 }
