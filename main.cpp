@@ -35,6 +35,23 @@ public:
         }
     }
 
+    // Конструктор копирования
+    Vector(const Vector<T>& other) : _size(other._size) {
+        _data = new T[_size];
+        std::copy(other._data, other._data + _size, _data);
+    }
+
+    // Оператор присваивания
+    Vector<T>& operator=(const Vector<T>& other) {
+        if (this != &other) {
+            delete[] _data; // Release existing resources
+            _size = other._size;
+            _data = new T[_size];
+            std::copy(other._data, other._data + _size, _data);
+        }
+        return *this;
+    }
+
     // Деструктор
     ~Vector() {
         delete[] _data;
@@ -172,6 +189,23 @@ public:
             T imagPart = dis(gen);
             _data[i] = std::complex<T>(realPart, imagPart);
         }
+    }
+
+    // Конструктор копирования
+    Vector(const Vector <std::complex<T>>& other) : _size(other._size) {
+        _data = new std::complex<T>[_size];
+        std::copy(other._data, other._data + _size, _data);
+    }
+
+    // Оператор присваивания
+    Vector <std::complex <T>>& operator=(const Vector <std::complex<T>>& other) {
+        if (this != &other) {
+            delete[] _data; // Release existing resources
+            _size = other._size;
+            _data = new std::complex<T>[_size];
+            std::copy(other._data, other._data + _size, _data);
+        }
+        return *this;
     }
 
     ~Vector() {
