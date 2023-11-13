@@ -3,6 +3,8 @@
 #include <ctime>
 #include <random>
 #include <complex>
+#include <cmath>
+#include <iomanip>
 
 template <typename T>
 class Vector {
@@ -39,7 +41,7 @@ public:
     }
 
     // Метод для получения размерности вектора
-    int get_size() {
+    int get_size() const{
         return _size;
     }
 
@@ -122,6 +124,24 @@ public:
             result[i] = _data[i] / scalar;
         }
         return result;
+    }
+
+    // Вывод вектора
+    friend std::ostream& operator<<(std::ostream& os, const Vector<T>& vector) {
+        os << "(";
+        for (int i = 0; i < vector._size; ++i) {
+            os << vector[i];
+            if (i < vector._size - 1) {
+                os << ", ";
+            }
+        }
+        os << ")";
+        return os;
+    }
+
+    Vector<T> normalize() const{
+        T magnitude = std::sqrt((*this) * (*this));  // Длина вектора
+        return (*this) / magnitude;
     }
 };
 
@@ -216,7 +236,7 @@ public:
     }
 
     // Оператор умножения вектора на скаляр (коммутативный)
-    Vector<std::complex<T>> operator*(const T& scalar) const {
+    Vector<std::complex<T>> operator*(const std::complex<T>& scalar) const {
         Vector<std::complex<T>> result(_size);
         for (int i = 0; i < _size; ++i) {
             result[i] = _data[i] * scalar;
@@ -225,7 +245,7 @@ public:
     }
 
     // Дружественная функция для обеспечения коммутативности умножения вектора на скаляр
-    friend Vector<std::complex<T>> operator*(const T& scalar, const Vector<std::complex<T>>& vector) {
+    friend Vector<std::complex<T>> operator*(const std::complex<T>& scalar, const Vector<std::complex<T>>& vector) {
         return vector * scalar;
     }
 
@@ -241,10 +261,80 @@ public:
         }
         return result;
     }
+
+    // Вывод вектора
+    friend std::ostream& operator<<(std::ostream& os, const Vector<std::complex<T>>& vector) {
+        os << "(";
+        for (int i = 0; i < vector._size; ++i) {
+            os << vector[i];
+            if (i < vector._size - 1) {
+                os << ", ";
+            }
+        }
+        os << ")";
+        return os;
+    }
+
+    Vector<std::complex<T>> normalize() {
+        T magnitude = std::sqrt((*this) * (*this)).real();  // Длина вектора
+        return (*this) / magnitude;
+    }
 };
+
+template <typename T>
+Vector<T> findPerpendicularUnitVector(const Vector<T>& v) {
+    if (v.get_size() < 2) {
+        throw std::invalid_argument("Vector dimension must be at least 2");
+    }
+
+    Vector<T> u_perpendicular(v.get_size(), 0);
+
+    u_perpendicular[0] = -v[1];
+    u_perpendicular[1] = v[0];
+
+    return u_perpendicular.normalize();
+}
+
+template <typename T>
+Vector<std::complex<T>> findPerpendicularUnitVector(const Vector<std::complex<T>>& v) {
+    if (v.get_size() < 2) {
+        throw std::invalid_argument("Vector dimension must be at least 2");
+    }
+
+    Vector<std::complex<T>> u_perpendicular(v.get_size(), std::complex<T>(0,0));
+
+    u_perpendicular[0] = -v[1];
+    u_perpendicular[1] = v[0];
+
+    return u_perpendicular.normalize();
+}
+
+
 
 int main() {
     srand(time(0));
+  
+    // Заданный вектор
+    Vector<double> v(2);
+
+    // Перпендикулярный единичный вектор
+    Vector<double> perpendicular = findPerpendicularUnitVector(v);
+
+    // Выводим результаты
+    std::cout << "Original Vector: " << v << std::endl;
+    std::cout << "Perpendicular Unit Vector: " << perpendicular << std::endl;
+
+    std::cout << std::endl;
+
+    // Заданный комплексный вектор
+    Vector<std::complex<double>> complex_v(2);
+
+    // Перпендикулярный единичный вектор
+    Vector<std::complex<double>> complex_perpendicular = findPerpendicularUnitVector(complex_v);
+
+    // Выводим результаты
+    std::cout << "Original Complex Vector: " << complex_v << std::endl;
+    std::cout << "Perpendicular Unit Vector: " << complex_perpendicular << std::endl;
 
     return 0;
 }
