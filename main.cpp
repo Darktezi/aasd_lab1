@@ -11,6 +11,7 @@ class Vector {
 private:
     T* _data;
     int _size;
+    static constexpr double precision = 1e-8;
 
 public:
     // Конструктор с параметрами: размерность вектора и значение для заполнения
@@ -75,6 +76,25 @@ public:
             throw std::out_of_range("Index out of range");
         }
         return _data[index];
+    }
+
+
+    //оператор == и !=
+
+    bool operator==(const Vector<T>& other) const{
+        if (_size != other._size) {
+            return false;
+        }
+        for (int i = 0; i < _size; ++i) {
+            if (std::abs(_data[i] - other._data[i]) > precision) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator!=(const Vector<T>& other) const{
+        return !(*this == other);
     }
 
     // Оператор сложения векторов
@@ -349,7 +369,7 @@ int main() {
     srand(time(0));
   
     // Заданный вектор
-    Vector<double> v(2);
+    Vector<double> v(3);
 
     // Перпендикулярный единичный вектор
     Vector<double> perpendicular = findPerpendicularUnitVector(v);
@@ -357,11 +377,17 @@ int main() {
     // Выводим результаты
     std::cout << "Original Vector: " << v << std::endl;
     std::cout << "Perpendicular Unit Vector: " << perpendicular << std::endl;
-
+    
+    if ((v * perpendicular) == 0) {
+        std::cout << "Answer: " << v * perpendicular << " correct" << std::endl;
+    }
+    else {
+        std::cout << "Answer: " << v * perpendicular << std::endl;
+    }
     std::cout << std::endl;
 
     // Заданный комплексный вектор
-    Vector<std::complex<double>> complex_v(2);
+    Vector<std::complex<double>> complex_v(3);
 
     // Перпендикулярный единичный вектор
     Vector<std::complex<double>> complex_perpendicular = findPerpendicularUnitVector(complex_v);
